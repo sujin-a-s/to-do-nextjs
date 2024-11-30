@@ -10,31 +10,12 @@ const jwt_secret : string = process.env.JWT_SECRET || ""
 export async function POST(req : NextRequest){
 
     try{
-        const token = req.cookies.get("id")?.value 
-        if(!token){
-            return NextResponse.json({
-                msg : "access denied"
-            })
-        }
-        
-        const decodedToken = verify(token, jwt_secret) as { userId: number } | undefined;
-        console.log(decodedToken)
-        if(!decodedToken){
-            return NextResponse.json({
-                msg : "invalid token"
-            })
-        }
+
     
         const body = await req.json()
         const todo = await client.todo.create({
             data : {
                 title : body.title,
-                description : body.description,
-                owner : {
-                    connect : {
-                        id : decodedToken.userId
-                    }
-                }
             }
         })
     
@@ -55,26 +36,10 @@ export async function POST(req : NextRequest){
 
 export async function GET(req : NextRequest){
     try{
-        const token = req.cookies.get("id")?.value 
-        if(!token){
-            return NextResponse.json({
-                msg : "access denied"
-            })
-        }
-        
-        const decodedToken = verify(token, jwt_secret) as { userId: number } | undefined;
-        console.log(decodedToken)
-        if(!decodedToken){
-            return NextResponse.json({
-                msg : "invalid token"
-            })
-        }
 
-        const todos = await client.todo.findMany({
-            where : {
-                userid : decodedToken.userId
-            }
-        })
+    
+
+        const todos = await client.todo.findMany()
         console.log(todos)
         return NextResponse.json({
             todos : todos
